@@ -14,3 +14,8 @@ clean:
 dep:
 	go mod download
 
+test:
+	go test ./...
+
+coverage:
+	go test ./... -cover
