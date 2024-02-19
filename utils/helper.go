@@ -2,27 +2,7 @@ package utils
 
 import (
 	"crypto/rand"
-	"crypto/sha256"
-	"fmt"
-
-	"golang.org/x/crypto/hkdf"
 )
-
-func Encrypt(masterPassword []byte) {
-	hash := sha256.New
-
-	salt := make([]byte, hash().Size())
-	if _, err := rand.Read(salt); err != nil {
-		panic(err)
-	}
-	info := []byte("")
-	//	data := []byte("My Data.")
-	h := hkdf.New(hash, masterPassword, salt, info)
-
-	// secretHex := hex.EncodeToString(masterPassword)
-
-	fmt.Println(h, hash().Size())
-}
 
 func RandomBytes(n uint32) ([]byte, error) {
 	b := make([]byte, n)

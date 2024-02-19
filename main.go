@@ -17,21 +17,15 @@ import (
 * */
 
 func main() {
-	/*
-		var pwd password.Password
-		pwd.Length = 15
-		pwd.HasUpper = true
-		pwd.HasLower = true
-		pwd.HasDigit = true
-		fmt.Println(pwd.Generate())
-		uppers := "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-		str := password.GenerateUpper(5)
-		fmt.Println(strings.Contains(uppers, str))
-		//	utils.Encrypt([]byte("secret"))
-	*/
-	plaintext := []byte("Secret Message")
-	password := []byte("MyPassword123456")
-	fmt.Println(Encrypt(plaintext, password))
+	var pwd core.Password
+	pwd.Length = 20
+	pwd.HasUpper = true
+	pwd.HasLower = true
+	pwd.HasDigit = true
+	pwd.HasSymbol = true
+	pwd.Generate()
+	fmt.Println(pwd.Text)
+	//	utils.Encrypt([]byte("secret"))
 	options := &core.Options{
 		SaltLength:  32,
 		KeyLength:   32,

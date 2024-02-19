@@ -83,6 +83,7 @@ func DecodeHash(hash string) (key, salt []byte, options *Options, err error) {
 
 func VerifyHash(passphrase string, hash string) (match bool, options *Options, err error) {
 	key, salt, o, err := DecodeHash(hash)
+	options = o
 	if err != nil {
 		return match, options, err
 	}

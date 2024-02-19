@@ -1,38 +1,92 @@
 package core
 
 import (
+	"regexp"
 	"testing"
 )
 
 type Test struct {
-	name   string
-	got    int
-	expect int
+	name string
+	got  string
+	want bool
 }
 
-func TestGenerateUpper(t *testing.T) {
-	//	test := Test{"5 should be 5", 5, 5}
-	uppers := "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-	str := GenerateUpper(5)
-	acc := 0
+func hasCharset(str, charset string) bool {
 	for _, s := range str {
-		found := false
-		for _, u := range uppers {
-			if u == s {
-				acc += 1
-				found = true
-				break
+		for _, c := range charset {
+			if s == c {
+				return true
 			}
 		}
-		if !found {
-			break
-		}
 	}
-	if len(str) != acc {
-		t.Fatal("GenerateUpper doesn't return Uppercased-alphabet")
+	return false
+}
+
+func TestGenerate(t *testing.T) {
+	upper := "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+	lower := "abcdefghijklmnopqrstuvwxyz"
+	number := "0123456789"
+	symbol := "/\\~`!@#$%^&*-_+=|{}[]();:'<>,.?\""
+	var pwd Password
+	pwd.Length = 25
+	pwd.Generate()
+	p := pwd.Text
+
+	if p != "" {
+		t.Fatalf("got %v expect empty string\n", p)
 	}
-	res := GenerateUpper(0)
-	if len(res) != 0 {
-		t.Fatalf("expected %v got %v\n", 0, len(res))
+
+	pwd.HasUpper = true
+	pwd.Generate()
+	strUpper := pwd.Text
+	match := hasCharset(strUpper, upper)
+
+	if !match {
+		t.Fatalf("expected %v got %v", true, match)
+	}
+
+	pwd.HasLower = true
+	pwd.Generate()
+	strLower := pwd.Text
+	match = hasCharset(strLower, lower)
+
+	if !match {
+		t.Fatalf("expected %v got %v", true, match)
+	}
+
+	pwd.HasDigit = true
+	pwd.Generate()
+	strDigit := pwd.Text
+	match = hasCharset(strDigit, number)
+
+	if !match {
+		t.Fatalf("input %v expected %v got %v", strDigit, true, match)
+	}
+
+	pwd.HasSymbol = true
+	pwd.Generate()
+	strSymbol := pwd.Text
+	match = hasCharset(strSymbol, symbol)
+
+	if !match {
+		t.Fatalf("expected %v got %v", true, match)
+	}
+
+	p = pwd.Text
+	if len(p) != 25 {
+		t.Fatalf("got %v expected %v\n", len(p), 25)
+	}
+}
+
+func TestString(t *testing.T) {
+	var pwd Password
+	pwd.Length = 10
+	pwd.HasLower = true
+	pwd.HasDigit = true
+	pwd.Generate()
+	pattern := regexp.MustCompile(`Password = [a-z0-9]{10} Charset = 36 Entropy = 51.7 bits`)
+
+	if !pattern.MatchString(pwd.String()) {
+		t.Fatal("String not matching")
 	}
 }
