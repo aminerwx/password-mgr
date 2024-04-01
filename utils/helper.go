@@ -2,29 +2,36 @@ package utils
 
 import (
 	"crypto/rand"
+	"fmt"
+	"os"
 )
 
 func RandomBytes(n uint32) ([]byte, error) {
-	b := make([]byte, n)
-	if _, err := rand.Read(b); err != nil {
+	buf := make([]byte, n)
+	if _, err := rand.Read(buf); err != nil {
 		return nil, err
 	}
-	return b, nil
+	return buf, nil
 }
 
-/*
- *  Encrypt:
- *
- *    - Input Binary -> StringDecode ------
- *
- *                                        > AES(DecodedBin, )
- *    HKDF inputs:
- *      Hash function i.e sha256
- *      Source key = key from which multiple keys can be derived
- *      length = number of bytes to derive
- *      contextInfo = arbitrary string used to bind a derived key to an intended context
- *      salt = optional extra randomness (recommended hash-length random value)
- *
- *
- *
- * */
+func ReadFile(filepath string) ([]byte, error) {
+	dat, err := os.ReadFile(filepath)
+	if err != nil {
+		return nil, err
+	}
+	return dat, nil
+}
+
+func WriteFile(filepath string, data []byte) error {
+	fmt.Println("File written.")
+	if err := os.WriteFile(filepath, data, 0600); err != nil {
+		return err
+	}
+	return nil
+}
+
+func Maybe(err error) {
+	if err != nil {
+		panic(err)
+	}
+}

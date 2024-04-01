@@ -1,20 +1,12 @@
 package main
 
 import (
-	"bytes"
-	"crypto/aes"
-	"crypto/cipher"
-	"crypto/rand"
 	"encoding/hex"
 	"fmt"
 
 	"github.com/aminerwx/password-mgr/core"
+	"github.com/aminerwx/password-mgr/utils"
 )
-
-/*
-* KDF -> Derive Key from passphrase and feed it to AES
-* AES -> Encrypt data
-* */
 
 func main() {
 	var pwd core.Password
@@ -25,71 +17,38 @@ func main() {
 	pwd.HasSymbol = true
 	pwd.Generate()
 	fmt.Println(pwd.Text)
-	//	utils.Encrypt([]byte("secret"))
+
+	// KDF options
 	options := &core.Options{
 		SaltLength:  32,
 		KeyLength:   32,
-		Iterations:  4,
-		Memory:      256 * 1024,
-		Parallelism: 6,
+		Iterations:  10,
+		Memory:      128 * 1024,
+		Parallelism: 2,
 	}
+
 	hash, err := core.CreateHash("password", options)
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println("Hash: ", hash)
-	k, s, o, err := core.DecodeHash(hash)
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println("Decoded Hash: ", string(k), string(s), o)
+	utils.Maybe(err)
+
 	match, _, err := core.VerifyHash("password", hash)
-	if err != nil {
-		panic(err)
-	}
-	fmt.Println(match)
-}
+	utils.Maybe(err)
 
-// TODO: AES256 encryption
-func Encrypt(plaintext []byte, key []byte) string {
-	aesBlock, err := aes.NewCipher(key)
-	if err != nil {
-		panic(err)
-	}
-	if len(plaintext) == 0 {
-		panic("plaintext is empty")
-	}
+	k, _, _, err := core.DecodeHash(hash)
+	utils.Maybe(err)
 
-	iv := make([]byte, aesBlock.BlockSize())
-	if _, err := rand.Read(iv); err != nil {
-		panic(err)
-	}
+	if match {
+		fmt.Println("Password is matching.")
+		ciphertxt, err := core.EncryptAES([]byte("SecretMsg"), []byte(k))
+		utils.Maybe(err)
 
-	cbc := cipher.NewCBCEncrypter(aesBlock, iv)
-	content := PKCS5Padding(plaintext, aesBlock.BlockSize())
-	ciphertext := make([]byte, len(content))
-	cbc.CryptBlocks(ciphertext, content)
-	return hex.EncodeToString(ciphertext)
-}
+		plaintext, err := core.DecryptAES(ciphertxt, []byte(k))
+		utils.Maybe(err)
 
-func Decrypt(ciphertext []byte, key []byte) string {
-	aesBlock, err := aes.NewCipher(key)
-	if err != nil {
-		panic(err)
+		cipher := hex.EncodeToString(ciphertxt)
+		plain := string(plaintext)
+		data := fmt.Sprintf("Secret Key: \n\t%v\nAES-256:\n\tciphertext: \n\t\t%v\n\tplaintext: \n\t\t%v\n", hash, cipher, plain)
+		utils.WriteFile("./out/data", []byte(data))
+	} else {
+		fmt.Println("Incorrect password.")
 	}
-	if len(ciphertext) == 0 {
-		panic("ciphertext is empty")
-	}
-
-	iv := make([]byte, aesBlock.BlockSize())
-	if _, err := rand.Read(iv); err != nil {
-		panic(err)
-	}
-	return ""
-}
-
-func PKCS5Padding(ciphertext []byte, blockSize int) []byte {
-	padding := blockSize - len(ciphertext)%blockSize
-	padtext := bytes.Repeat([]byte{byte(padding)}, padding)
-	return append(ciphertext, padtext...)
 }

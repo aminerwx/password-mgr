@@ -19,6 +19,7 @@ type Options struct {
 	Parallelism uint8
 }
 
+// Generate secret key and salt (argon2id KDF) from passphrase and options.
 func GenerateKey(passphrase string, options *Options) (key, salt []byte, err error) {
 	pwd := []byte(passphrase)
 	if len(pwd) == 0 {
@@ -34,6 +35,7 @@ func GenerateKey(passphrase string, options *Options) (key, salt []byte, err err
 	return key, salt, nil
 }
 
+// Create an argon2id string representation from secret key, salt and options
 func CreateHash(passphrase string, options *Options) (hash string, err error) {
 	key, salt, err := GenerateKey(passphrase, options)
 	if err != nil {
@@ -47,6 +49,7 @@ func CreateHash(passphrase string, options *Options) (hash string, err error) {
 	return hash, nil
 }
 
+// Extract secret key, salt and options from argon2id string representation
 func DecodeHash(hash string) (key, salt []byte, options *Options, err error) {
 	values := strings.Split(hash, "$")
 	if len(values) != 6 {
@@ -81,6 +84,7 @@ func DecodeHash(hash string) (key, salt []byte, options *Options, err error) {
 	return key, salt, options, nil
 }
 
+// Compare passphrase and decoded hash
 func VerifyHash(passphrase string, hash string) (match bool, options *Options, err error) {
 	key, salt, o, err := DecodeHash(hash)
 	options = o

@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"math"
 	"math/big"
-	mrand "math/rand"
+	mrand "math/rand/v2"
 	"strings"
 )
 
@@ -21,6 +21,11 @@ type Password struct {
 	HasSymbol     bool
 }
 
+// TODO:
+// create & persist database file
+// encrypt/decrypt database file
+
+// Generate random string
 func (p *Password) Generate() {
 	var password strings.Builder
 
@@ -52,16 +57,21 @@ func (p *Password) Generate() {
 		index, _ := crand.Int(crand.Reader, big.NewInt(int64(p.CharsetLength)))
 		password.WriteString(string(p.Charset[index.Int64()]))
 	}
+
 	p.Text = password.String()
+
 	entropy := math.Log2(math.Pow(float64(p.CharsetLength), float64(p.Length)))
 	p.Entropy = math.Round(entropy*100) / 100
+
 	shuff := []rune(password.String())
 	mrand.Shuffle(len(shuff), func(i, j int) {
 		shuff[i], shuff[j] = shuff[j], shuff[i]
 	})
+
 	p.Text = string(shuff)
 }
 
+// Password struct string representation
 func (p *Password) String() string {
 	if len(p.Text) == 0 {
 		return p.Text
