@@ -1,0 +1,66 @@
+To summarize:
+    Master Password:
+        The master password is hashed using Argon2id (or a similar key derivation function) and stored in the database for authentication.
+        This ensures that even if the database is compromised, the master password cannot be easily brute-forced.
+
+    User Credentials:
+        User credentials (e.g., username/password for various services) are encrypted using a symmetric encryption algorithm like AES.
+        The encryption key is derived from the user's master password (via Argon2id or another key derivation function) and never stored directly in the        database.
+        Instead of encrypting each credential with a separate key, all credentials in a user's vault are typically encrypted with a single symmetric key (referred to as the "vault encryption key").
+
+Correct Workflow
+
+    Master Password Hash (for authentication):
+        Use Argon2id to hash the master password and store the resulting hash in the database.
+        Example:
+
+        $argon2id$v=19$m=65536,t=3,p=4$randomsalt$hash
+
+    Vault Encryption Key:
+        Derive a vault encryption key from the master password (using Argon2id or PBKDF2 with a separate salt).
+        This key is used for AES encryption of all user credentials.
+        Do not store this key in the database; it should be derived dynamically from the master password during login.
+
+    Encrypted Vault Data:
+        Encrypt the entire vault (or individual credentials) using AES with the vault encryption key.
+        Store the encrypted data in the database along with any metadata (e.g., URLs, usernames).
+
+Example Database Schema
+Table: Users
+
+Stores user authentication data (hashed master password and salt):
+
+CREATE TABLE users (
+    id SERIAL PRIMARY KEY,
+    username VARCHAR(255) UNIQUE NOT NULL,
+    master_password_hash TEXT NOT NULL, -- Argon2id hash of master password
+    salt BYTEA NOT NULL -- Unique salt for Argon2id
+);
+
+Table: Vault
+
+Stores the encrypted credentials:
+
+CREATE TABLE vault (
+    id SERIAL PRIMARY KEY,
+    user_id INT REFERENCES users(id),
+    encrypted_data BYTEA NOT NULL, -- AES-encrypted credentials
+    metadata JSONB -- Optional: URLs, labels, or other non-sensitive data
+);
+
+High-Level Flow
+
+    User Registration:
+        Hash the master password with Argon2id and store the hash and salt in the users table.
+        Derive a vault encryption key from the master password and encrypt the user's credentials (if any).
+
+    User Login:
+        Verify the master password against the stored Argon2id hash.
+        If successful, derive the vault encryption key and decrypt the vault data.
+
+    Credential Storage:
+        When a user adds a new credential, encrypt it with the vault encryption key and save it in the database.
+
+    Credential Retrieval:
+        Fetch the encrypted data from the database.
+        Decrypt it using the vault encryption key derived from the master password.

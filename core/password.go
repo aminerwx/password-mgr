@@ -26,11 +26,11 @@ type Password struct {
 // encrypt/decrypt database file
 
 // Generate random string
-func (p *Password) Generate() {
+func (p *Password) Generate() string {
 	var password strings.Builder
 
 	if !p.HasUpper && !p.HasLower && !p.HasDigit && !p.HasSymbol {
-		return
+		return ""
 	}
 
 	if p.HasUpper {
@@ -69,6 +69,7 @@ func (p *Password) Generate() {
 	})
 
 	p.Text = string(shuff)
+	return p.Text
 }
 
 // Password struct string representation

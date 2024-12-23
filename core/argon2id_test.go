@@ -7,9 +7,7 @@ import (
 	"testing"
 )
 
-var DefaultOptions = &Options{
-	SaltLength:  32,
-	KeyLength:   32,
+var DefaultOptions = &Argon2idOptions{
 	Iterations:  4,
 	Memory:      256 * 1024,
 	Parallelism: 6,
