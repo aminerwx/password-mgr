@@ -1,4 +1,4 @@
-package core
+package internal
 
 import (
 	crand "crypto/rand"
@@ -25,8 +25,8 @@ type Password struct {
 // create & persist database file
 // encrypt/decrypt database file
 
-// Generate random string
-func (p *Password) Generate() string {
+// Generate random string based on charset
+func (p *Password) NewRandomString() string {
 	var password strings.Builder
 
 	if !p.HasUpper && !p.HasLower && !p.HasDigit && !p.HasSymbol {
@@ -73,7 +73,7 @@ func (p *Password) Generate() string {
 }
 
 // Password struct string representation
-func (p *Password) String() string {
+func (p *Password) ToString() string {
 	if len(p.Text) == 0 {
 		return p.Text
 	}

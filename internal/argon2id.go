@@ -1,4 +1,4 @@
-package core
+package internal
 
 import (
 	"crypto/subtle"
@@ -28,7 +28,7 @@ func NewArgon2idOptions(iterations, mb uint32, parallel uint8) Argon2idOptions {
 }
 
 // Generate secret key and salt (argon2id KDF) from passphrase and options.
-func GenerateKey(passphrase string, options *Argon2idOptions) (key, salt []byte, err error) {
+func Generate(passphrase string, options *Argon2idOptions) (key, salt []byte, err error) {
 	pwd := []byte(passphrase)
 	if len(pwd) == 0 {
 		return nil, nil, errors.New("empty passphrase")
@@ -44,8 +44,8 @@ func GenerateKey(passphrase string, options *Argon2idOptions) (key, salt []byte,
 }
 
 // Create an argon2id string representation from secret key, salt and options
-func CreateHash(passphrase string, options *Argon2idOptions) (hash string, err error) {
-	key, salt, err := GenerateKey(passphrase, options)
+func NewHash(passphrase string, options *Argon2idOptions) (hash string, err error) {
+	key, salt, err := Generate(passphrase, options)
 	if err != nil {
 		return "", err
 	}
@@ -57,8 +57,8 @@ func CreateHash(passphrase string, options *Argon2idOptions) (hash string, err e
 	return hash, nil
 }
 
-// Extract secret key, salt and options from argon2id string representation
-func DecodeHash(hash string) (key, salt []byte, options *Argon2idOptions, err error) {
+// Decode argon2id hash and returns secret key, salt and options
+func Decode(hash string) (key, salt []byte, options *Argon2idOptions, err error) {
 	values := strings.Split(hash, "$")
 	if len(values) != 6 {
 		return nil, nil, nil, errors.New("argon2id format is invalid")
@@ -91,8 +91,8 @@ func DecodeHash(hash string) (key, salt []byte, options *Argon2idOptions, err er
 }
 
 // Compare passphrase and decoded hash
-func VerifyHash(passphrase string, hash string) (match bool, options *Argon2idOptions, err error) {
-	key, salt, o, err := DecodeHash(hash)
+func Compare(passphrase string, hash string) (match bool, options *Argon2idOptions, err error) {
+	key, salt, o, err := Decode(hash)
 	options = o
 	if err != nil {
 		return match, options, err

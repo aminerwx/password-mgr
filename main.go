@@ -29,11 +29,11 @@ func main() {
 	pwd.HasLower = true
 	pwd.HasDigit = true
 	pwd.HasSymbol = true
-	pwd.Generate()
-	fmt.Println(pwd.String())
+	pwd.NewRandomString()
+	fmt.Println(pwd.ToString())
 
 	// store master password hash in db
-	hash, err := core.CreateHash("master password", &core.MyArgon2idOptions)
+	hash, err := core.NewHash("master password", &core.MyArgon2idOptions)
 	utils.Maybe(err)
 	fmt.Println(hash)
 

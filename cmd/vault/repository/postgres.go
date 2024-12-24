@@ -11,3 +11,8 @@ type PostgresStorage struct {
 func NewPostgresRepository(pool *pgxpool.Pool) *PostgresStorage {
 	return &PostgresStorage{pool: pool}
 }
+
+type Repository interface {
+	UserRepository
+	VaultRepository
+}

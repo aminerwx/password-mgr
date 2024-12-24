@@ -104,7 +104,7 @@ func (v Vault) Save(root Group) error {
 		log.Fatalln("error marshal")
 	}
 	opts := core.NewArgon2idOptions(10, 20, 2)
-	hash, err := core.CreateHash("pwd", &opts)
+	hash, err := core.NewHash("pwd", &opts)
 	if err != nil {
 		return err
 	}

@@ -1,4 +1,4 @@
-package core
+package internal
 
 import (
 	"fmt"
@@ -15,12 +15,12 @@ var DefaultOptions = &Argon2idOptions{
 
 func TestCreateHash(t *testing.T) {
 	hashPattern := regexp.MustCompile(`^\$argon2id\$v=19\$m=[0-9]{1,8},t=[0-9]{1,2},p=[0-9]{1,2}\$[A-Za-z0-9+/]{43}\$[A-Za-z0-9+/]{43}$`)
-	hash1, err := CreateHash("mYP4$sw0rD", DefaultOptions)
+	hash1, err := NewHash("mYP4$sw0rD", DefaultOptions)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	hash2, err := CreateHash("mYP4$sw0rD", DefaultOptions)
+	hash2, err := NewHash("mYP4$sw0rD", DefaultOptions)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -39,11 +39,11 @@ func TestCreateHash(t *testing.T) {
 }
 
 func TestDecodeHash(t *testing.T) {
-	hash, err := CreateHash("Pa$sw0rDu", DefaultOptions)
+	hash, err := NewHash("Pa$sw0rDu", DefaultOptions)
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, _, options, err := DecodeHash(hash)
+	_, _, options, err := Decode(hash)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -54,12 +54,12 @@ func TestDecodeHash(t *testing.T) {
 }
 
 func TestVerifyHash(t *testing.T) {
-	hash, err := CreateHash("Pa$sw0rDu", DefaultOptions)
+	hash, err := NewHash("Pa$sw0rDu", DefaultOptions)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	ok, options, err := VerifyHash("Pa$sw0rDu", hash)
+	ok, options, err := Compare("Pa$sw0rDu", hash)
 	if err != nil {
 		fmt.Println("PRINT FATAL")
 		t.Fatal(err)

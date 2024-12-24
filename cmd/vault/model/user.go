@@ -6,16 +6,16 @@ import (
 )
 
 type User struct {
-	ID                 string `json:"id"`
-	Username           string `json:"username"`
-	MasterPasswordHash string `json:"master_password_hash"`
+	ID             string `json:"id"`
+	Username       string `json:"username"`
+	MasterPassword string `json:"master_password"`
 }
 
 func NewUser(username, masterPassword string) (User, error) {
-	hash, err := core.CreateHash(masterPassword, &core.MyArgon2idOptions)
+	hash, err := core.NewHash(masterPassword, &core.MyArgon2idOptions)
 	if err != nil {
 		return User{}, err
 	}
 	id := uuid.New()
-	return User{ID: id.String(), Username: username, MasterPasswordHash: hash}, nil
+	return User{ID: id.String(), Username: username, MasterPassword: hash}, nil
 }

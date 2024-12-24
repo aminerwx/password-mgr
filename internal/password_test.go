@@ -1,4 +1,4 @@
-package core
+package internal
 
 import (
 	"regexp"
@@ -29,7 +29,7 @@ func TestGenerate(t *testing.T) {
 	symbol := "/\\~`!@#$%^&*-_+=|{}[]();:'<>,.?\""
 	var pwd Password
 	pwd.Length = 25
-	pwd.Generate()
+	pwd.NewRandomString()
 	p := pwd.Text
 
 	if p != "" {
@@ -37,7 +37,7 @@ func TestGenerate(t *testing.T) {
 	}
 
 	pwd.HasUpper = true
-	pwd.Generate()
+	pwd.NewRandomString()
 	strUpper := pwd.Text
 	match := hasCharset(strUpper, upper)
 
@@ -46,7 +46,7 @@ func TestGenerate(t *testing.T) {
 	}
 
 	pwd.HasLower = true
-	pwd.Generate()
+	pwd.NewRandomString()
 	strLower := pwd.Text
 	match = hasCharset(strLower, lower)
 
@@ -55,7 +55,7 @@ func TestGenerate(t *testing.T) {
 	}
 
 	pwd.HasDigit = true
-	pwd.Generate()
+	pwd.NewRandomString()
 	strDigit := pwd.Text
 	match = hasCharset(strDigit, number)
 
@@ -64,7 +64,7 @@ func TestGenerate(t *testing.T) {
 	}
 
 	pwd.HasSymbol = true
-	pwd.Generate()
+	pwd.NewRandomString()
 	strSymbol := pwd.Text
 	match = hasCharset(strSymbol, symbol)
 
@@ -83,10 +83,10 @@ func TestString(t *testing.T) {
 	pwd.Length = 10
 	pwd.HasLower = true
 	pwd.HasDigit = true
-	pwd.Generate()
+	pwd.NewRandomString()
 	pattern := regexp.MustCompile(`Password = [a-z0-9]{10} Charset = 36 Entropy = 51.7 bits`)
 
-	if !pattern.MatchString(pwd.String()) {
+	if !pattern.MatchString(pwd.ToString()) {
 		t.Fatal("String not matching")
 	}
 }

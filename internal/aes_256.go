@@ -1,4 +1,4 @@
-package core
+package internal
 
 import (
 	"crypto/aes"
@@ -8,7 +8,7 @@ import (
 )
 
 // Encrypt plaintext (Secret message) using secret key (argon2id)
-func EncryptAES(plaintext []byte, key []byte) ([]byte, error) {
+func Encrypt(plaintext []byte, key []byte) ([]byte, error) {
 	block, err := aes.NewCipher(key)
 	if err != nil {
 		return nil, err
@@ -29,7 +29,7 @@ func EncryptAES(plaintext []byte, key []byte) ([]byte, error) {
 }
 
 // Decrypt ciphertext using secret key (argon2id)
-func DecryptAES(ciphertext []byte, key []byte) ([]byte, error) {
+func Decrypt(ciphertext []byte, key []byte) ([]byte, error) {
 	block, err := aes.NewCipher(key)
 	if err != nil {
 		return nil, err
