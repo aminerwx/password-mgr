@@ -91,22 +91,20 @@ func Decode(hash string) (key, salt []byte, options *Argon2idOptions, err error)
 }
 
 // Compare passphrase and decoded hash
-func Compare(passphrase string, hash string) (match bool, options *Argon2idOptions, err error) {
+func Compare(passphrase string, hash string) (bool, *Argon2idOptions, error) {
 	key, salt, o, err := Decode(hash)
-	options = o
 	if err != nil {
-		return match, options, err
+		return false, o, err
 	}
 	otherKey := argon2.IDKey([]byte(passphrase), salt, o.Iterations, o.Memory, o.Parallelism, 32)
 
 	keyLen := int32(len(key))
 	otherKeyLen := int32(len(otherKey))
 	if subtle.ConstantTimeEq(keyLen, otherKeyLen) == 0 {
-		return false, options, nil
+		return false, o, nil
 	}
 	if subtle.ConstantTimeCompare(key, otherKey) == 1 {
-		return true, options, nil
+		return true, o, nil
 	}
-
-	return match, options, err
+	return false, o, nil
 }

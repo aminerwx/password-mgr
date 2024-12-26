@@ -1,11 +1,12 @@
-package api
+package handler
 
 import (
 	"net/http"
+
+	"github.com/gin-gonic/gin"
 )
 
-func (s *Server) GetVaultHandler(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
+func (s *Server) GetVaultHandler(c *gin.Context) {
 }
 
 func (s *Server) CreateVaultHandler(w http.ResponseWriter, r *http.Request) {

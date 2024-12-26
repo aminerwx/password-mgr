@@ -6,7 +6,7 @@ import (
 	"log"
 	"time"
 
-	"github.com/aminerwx/password-mgr/core"
+	"github.com/aminerwx/password-mgr/internal"
 	"github.com/google/uuid"
 )
 
@@ -103,8 +103,8 @@ func (v Vault) Save(root Group) error {
 	if err != nil {
 		log.Fatalln("error marshal")
 	}
-	opts := core.NewArgon2idOptions(10, 20, 2)
-	hash, err := core.NewHash("pwd", &opts)
+	opts := internal.NewArgon2idOptions(10, 20, 2)
+	hash, err := internal.NewHash("pwd", &opts)
 	if err != nil {
 		return err
 	}

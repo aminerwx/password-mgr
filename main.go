@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/aminerwx/password-mgr/core"
+	"github.com/aminerwx/password-mgr/internal"
 	"github.com/aminerwx/password-mgr/utils"
 )
 
@@ -11,10 +11,10 @@ import (
 // Create object structure
 // Serialize it and encrypt it
 type Credential struct {
-	Title    string        `json:"title"`
-	Username string        `json:"username"`
-	Password core.Password `json:"password"`
-	Url      string        `json:"url"`
+	Title    string            `json:"title"`
+	Username string            `json:"username"`
+	Password internal.Password `json:"password"`
+	Url      string            `json:"url"`
 }
 
 type File struct {
@@ -23,7 +23,7 @@ type File struct {
 }
 
 func main() {
-	var pwd core.Password
+	var pwd internal.Password
 	pwd.Length = 20
 	pwd.HasUpper = true
 	pwd.HasLower = true
@@ -33,26 +33,26 @@ func main() {
 	fmt.Println(pwd.ToString())
 
 	// store master password hash in db
-	hash, err := core.NewHash("master password", &core.MyArgon2idOptions)
+	hash, err := internal.NewHash("master password", &internal.MyArgon2idOptions)
 	utils.Maybe(err)
 	fmt.Println(hash)
 
 	// retrieve hash and compare
-	// match, _, err := core.VerifyHash("master password", hash)
+	// match, _, err := internal.VerifyHash("master password", hash)
 	// utils.Maybe(err)
 
 	// if match {
 	//	fmt.Println("Password is matching.")
-	//	k, _, _, err := core.DecodeHash(hash)
+	//	k, _, _, err := internal.DecodeHash(hash)
 	//	fmt.Println(k)
 	//	utils.Maybe(err)
 
 	//	// Encrypt User Data
-	//	cipher, err := core.EncryptAES([]byte("SecretMsg"), []byte(k))
+	//	cipher, err := internal.EncryptAES([]byte("SecretMsg"), []byte(k))
 	//	utils.Maybe(err)
 
 	//	// Decrypt User Data
-	//	plaintext, err := core.DecryptAES(cipher, []byte(k))
+	//	plaintext, err := internal.DecryptAES(cipher, []byte(k))
 	//	utils.Maybe(err)
 
 	//	ciphertxt := hex.EncodeToString(cipher)

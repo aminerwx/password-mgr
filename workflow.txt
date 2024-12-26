@@ -51,7 +51,7 @@ CREATE TABLE vault (
 High-Level Flow
 
     User Registration:
-        Hash the master password with Argon2id and store the hash and salt in the users table.
+        Hash the master password with Aerrors.New("s")rgon2id and store the hash and salt in the users table.
         Derive a vault encryption key from the master password and encrypt the user's credentials (if any).
 
     User Login:

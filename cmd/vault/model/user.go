@@ -1,7 +1,9 @@
 package model
 
 import (
-	"github.com/aminerwx/password-mgr/core"
+	"errors"
+
+	"github.com/aminerwx/password-mgr/internal"
 	"github.com/google/uuid"
 )
 
@@ -12,7 +14,10 @@ type User struct {
 }
 
 func NewUser(username, masterPassword string) (User, error) {
-	hash, err := core.NewHash(masterPassword, &core.MyArgon2idOptions)
+	if len(username) == 0 {
+		return User{}, errors.New("func NewUser: empty username")
+	}
+	hash, err := internal.NewHash(masterPassword, &internal.MyArgon2idOptions)
 	if err != nil {
 		return User{}, err
 	}
