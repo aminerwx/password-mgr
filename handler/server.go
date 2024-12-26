@@ -3,8 +3,8 @@ package handler
 import (
 	"net/http"
 
-	"github.com/aminerwx/password-mgr/cmd/vault/model"
-	"github.com/aminerwx/password-mgr/cmd/vault/repository"
+	"github.com/aminerwx/password-mgr/model"
+	"github.com/aminerwx/password-mgr/repository"
 	"github.com/gin-gonic/gin"
 )
 

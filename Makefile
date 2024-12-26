@@ -22,3 +22,7 @@ test:
 
 coverage:
 	@go test ./... -cover
+
+make server:
+	@templ generate
+	@go run .

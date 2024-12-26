@@ -1,6 +1,6 @@
 package repository
 
-import "github.com/aminerwx/password-mgr/cmd/vault/model"
+import "github.com/aminerwx/password-mgr/model"
 
 type VaultRepository interface {
 	GetVault(username, master string) (model.Vault, error)

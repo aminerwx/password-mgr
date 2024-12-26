@@ -6,7 +6,7 @@ import (
 	"log"
 	"net/http"
 
-	"github.com/aminerwx/password-mgr/cmd/vault/model"
+	"github.com/aminerwx/password-mgr/model"
 )
 
 // Handle user auth

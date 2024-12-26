@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/aminerwx/password-mgr/cmd/vault/model"
+	"github.com/aminerwx/password-mgr/model"
 )
 
 type UserRepository interface {
