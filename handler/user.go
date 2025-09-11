@@ -12,8 +12,7 @@ import (
 // Handle user auth
 func (s *Server) GetUserHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	id := r.PathValue("id")
-	user, err := s.store.GetUser(id)
+	user, err := s.store.GetUser("")
 	if err != nil {
 		w.WriteHeader(StatusNotFoundJSON.StatusCode)
 		json.NewEncoder(w).Encode(StatusNotFoundJSON)

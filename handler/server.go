@@ -3,8 +3,10 @@ package handler
 import (
 	"net/http"
 
+	"github.com/aminerwx/password-mgr/middleware"
 	"github.com/aminerwx/password-mgr/model"
 	"github.com/aminerwx/password-mgr/repository"
+	"github.com/aminerwx/password-mgr/view"
 	"github.com/gin-gonic/gin"
 )
 
@@ -17,27 +19,19 @@ func NewServer(store repository.Repository, port string) *Server {
 	return &Server{store: store, port: port}
 }
 
-//func (s *Server) Start() error {
-//	mux := http.NewServeMux()
-//	mux.HandleFunc("POST /users", s.CreateUserHandler)
-//	mux.HandleFunc("GET /users/{id}", s.GetUserHandler)
-//	mux.HandleFunc("PUT /users/{id}", s.UpdateUserHandler)
-//	mux.HandleFunc("DELETE /users/{id}", s.RemoveUserHandler)
-//	mux.HandleFunc("POST /vaults", s.CreateVaultHandler)
-//	mux.HandleFunc("GET /vaults/{id}", s.GetVaultHandler)
-//	mux.HandleFunc("PUT /vaults/{id}", s.UpdateVaultHandler)
-//	mux.HandleFunc("DELETE /vaults/{id}", s.RemoveVaultHandler)
-//	wrappedMux := middleware.NewLogger(mux)
-//	return http.ListenAndServe(s.port, wrappedMux)
-//}
-
 func (s *Server) Start() error {
 	router := gin.Default()
+	router.SetTrustedProxies(nil)
+	router.GET("/", func(ctx *gin.Context) {
+		view.Render(ctx, view.ViewIndexTemplate)
+	})
+
 	router.GET("/auth/signin", s.ViewSigninHandler)
 	router.POST("/auth/signin", s.SubmitSigninHandler)
 	router.GET("/auth/signup", s.ViewSignupHandler)
 	router.POST("/auth/signup", s.SubmitSignupHandler)
-	router.GET("/vault", s.GetVaultHandler)
+	router.GET("/vault", middleware.AuthenticationMiddleware, s.GetVaultHandler)
+
 	return router.Run(s.port)
 }
 

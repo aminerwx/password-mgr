@@ -2,5 +2,17 @@ package view
 
 
 templ ViewSignupTemplate() {
-
+  @ViewTemplate() {
+  <div>
+    <div>
+      <h2>Signup Form</h2>
+    </div>
+    <form action="/auth/signup" method="POST">
+      <div><input type="text" name="username" placeholder="Username.." required></div> 
+      <div><input type="password" name="master" placeholder="Master Password.." required></div> 
+      <div><input type="password" name="confirm" placeholder="Confirm Master Password.." required></div> 
+      <div><button type="submit" name="signup" value="signup">Sign Up</button></div> 
+    </form>
+  </div>
+  }
 }

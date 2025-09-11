@@ -1,7 +1,0 @@
-*.*
-!.gitignore
-!Makefile
-!LICENSE
-!go.mod
-!go.sum
-!*/

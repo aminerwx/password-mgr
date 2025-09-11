@@ -7,8 +7,93 @@ import (
 	"time"
 
 	"github.com/aminerwx/password-mgr/internal"
-	"github.com/google/uuid"
 )
+
+type Vault struct {
+	ID        int           `json:"id"`
+	UserID    string        `json:"user_id"`
+	Timestamp Record        `json:"timestamp"`
+	Data      EncryptedData `json:"data"`
+}
+
+type EncryptedData []byte
+
+type Credential struct {
+	ID        int    `json:"id"`
+	Title     string `json:"title"`
+	Username  string `json:"username"`
+	Password  string `json:"password"`
+	Url       string `json:"url"`
+	Tag       string `json:"tag"`
+	Timestamp Record `json:"timestamp"`
+}
+
+type Group struct {
+	Title     string       `json:"title"`
+	Entries   []Credential `json:"entries"`
+	SubGroups []Group      `json:"subgroups"`
+}
+
+func NewGroup(title string) Group {
+	return Group{Title: title}
+}
+
+func (g Group) AddEntry(entry Credential) {
+	g.Entries = append(g.Entries, entry)
+}
+
+func (g Group) RemoveEntry(id int) {
+	for k, v := range g.Entries {
+		if id == v.ID {
+			if k == len(g.Entries)-1 {
+				g.Entries = g.Entries[:k]
+				break
+			} else {
+				g.Entries = append(g.Entries[:k], g.Entries[:k+1]...)
+				break
+			}
+		}
+	}
+}
+
+func NewCredential(title, username, password string) Credential {
+	return Credential{
+		Title:     title,
+		Username:  username,
+		Password:  password,
+		Timestamp: NewRecord(),
+	}
+}
+
+func NewVault(userID, masterPasswordHash string) Vault {
+	root := NewGroup("root")
+	rootJSON, _ := json.Marshal(root)
+	key, _, _, _ := internal.Decode(masterPasswordHash)
+
+	encryptedData, err := internal.Encrypt(rootJSON, key)
+	if err != nil {
+		log.Fatal(err)
+	}
+	return Vault{
+		Timestamp: NewRecord(),
+		UserID:    userID,
+		Data:      encryptedData,
+	}
+}
+
+func (v Vault) Save(root Group) error {
+	_, err := json.Marshal(root)
+	if err != nil {
+		log.Fatalln("error marshal")
+	}
+	opts := internal.NewArgon2idOptions(10, 20, 2)
+	hash, err := internal.NewHash("pwd", &opts)
+	if err != nil {
+		return err
+	}
+	fmt.Println(hash)
+	return nil
+}
 
 type Record struct {
 	CreatedAt  time.Time `json:"created_at"`
@@ -31,83 +116,4 @@ func (r *Record) UpdateAccessedAt() {
 
 func (r *Record) UpdateModifiedAt() {
 	r.ModifiedAt = time.Now()
-}
-
-type Credential struct {
-	ID        string `json:"id"`
-	Title     string `json:"title"`
-	Username  string `json:"username"`
-	Password  string `json:"password"`
-	Url       string `json:"url"`
-	Tag       string `json:"tag"`
-	Timestamp Record `json:"timestamp"`
-}
-
-func NewCredential(title, username, password string) Credential {
-	return Credential{
-		Title:     title,
-		Username:  username,
-		Password:  password,
-		Timestamp: NewRecord(),
-	}
-}
-
-type Group struct {
-	Title     string       `json:"title"`
-	Entries   []Credential `json:"entries"`
-	SubGroups []Group      `json:"subgroups"`
-}
-
-func NewGroup(title string) Group {
-	return Group{Title: title}
-}
-
-func (g Group) AddEntry(entry Credential) {
-	g.Entries = append(g.Entries, entry)
-}
-
-func (g Group) RemoveEntry(id string) {
-	for k, v := range g.Entries {
-		if id == v.ID {
-			if k == len(g.Entries)-1 {
-				g.Entries = g.Entries[:k]
-				break
-			} else {
-				g.Entries = append(g.Entries[:k], g.Entries[:k+1]...)
-				break
-			}
-		}
-	}
-}
-
-type Vault struct {
-	ID                 string `json:"id"`
-	UserID             string `json:"user_id"`
-	MasterPasswordHash string `json:"master_password_hash"`
-	EncryptedData      []byte `json:"encrypted_data"`
-	Timestamp          Record `json:"timestamp"`
-}
-
-func NewVault(userID string, master string) Vault {
-	id := uuid.New()
-	return Vault{
-		ID:                 id.String(),
-		Timestamp:          NewRecord(),
-		UserID:             userID,
-		MasterPasswordHash: master,
-	}
-}
-
-func (v Vault) Save(root Group) error {
-	_, err := json.Marshal(root)
-	if err != nil {
-		log.Fatalln("error marshal")
-	}
-	opts := internal.NewArgon2idOptions(10, 20, 2)
-	hash, err := internal.NewHash("pwd", &opts)
-	if err != nil {
-		return err
-	}
-	fmt.Println(hash)
-	return nil
 }

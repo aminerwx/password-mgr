@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -8,6 +9,8 @@ import (
 	"github.com/aminerwx/password-mgr/handler"
 	"github.com/aminerwx/password-mgr/internal"
 	"github.com/aminerwx/password-mgr/model"
+	"github.com/aminerwx/password-mgr/repository"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 // Fill Entry
@@ -86,22 +89,22 @@ func main() {
 	// fmt.Printf("%+v\n", v)
 	// os.WriteFile("root.json", encryptedData, 0644)
 	// fmt.Println("Server started at localhost:3333")
-	// uri := "postgresql://postgres@localhost:5432/password_mgr?sslmode=disable"
-	// pool, err := pgxpool.New(context.Background(), uri)
-	// defer pool.Close()
+	uri := "postgresql://postgres@localhost:5432/password_mgr?sslmode=disable"
+	pool, err := pgxpool.New(context.Background(), uri)
+	defer pool.Close()
 	//
 	//	if err != nil {
 	//		log.Fatalf("unable to connect to database: %v", err)
 	//	}
 	//
-	// store := repository.NewPostgresRepository(pool)
 	//
 	// srv := api.NewServer(store, ":3333")
 	//
 	//	if err := srv.Start(); err != nil {
 	//		panic(err)
 	//	}
-	srv := handler.NewServer(nil, ":3000")
+	store := repository.NewPostgresRepository(pool)
+	srv := handler.NewServer(store, ":3000")
 	srv.Start()
 }
 

@@ -1,5 +1,15 @@
 package view
 
 templ ViewIndexTemplate() {
-
+  @ViewTemplate() {
+    <div>
+      <div>
+        <h2>Index</h2>
+      </div>
+      <div>
+        <a href="/auth/signin"><input type="submit" name="signin" value="Sign In"></a>
+        <a href="/auth/signup"><input type="submit" name="signup" value="Sign Up"></a>
+      </div>
+    </div>
+  }
 }
